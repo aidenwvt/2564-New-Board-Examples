@@ -1,4 +1,4 @@
-// This application uses button 2 and LED 1
+// This application uses launchpad button 2 (LB2) and launchpad LED 1 (LL1)
 // The operation is such that if you press the right button, as long as you keep the button pressed,
 // the LED is on. As soon as you release the button, LED is off and stays off until the button is pressed again.
 // This example uses Driverlib functions, so it is easier than using memory-mapped registers directly.
@@ -9,7 +9,7 @@
 #define POWER_STARTUP_DELAY 16
 #define PRESSED 0
 
-int main(void) {
+int main() {
     //Clear any current instructions from the pins
     DL_GPIO_reset(GPIOA);
     DL_GPIO_reset(GPIOB);
@@ -21,7 +21,7 @@ int main(void) {
     //Always delay after enabling power to give the board time to configure
     DL_Common_delayCycles(POWER_STARTUP_DELAY);
 
-    //Initiates the Launchpad LED1 (LL1) as an input
+    //Initiates the Launchpad LED1 (LL1) as an output
     DL_GPIO_initDigitalOutput(IOMUX_PINCM1); //Connects port A, pin 0 to the GPIO
     DL_GPIO_enableOutput(GPIOA, DL_GPIO_PIN_0); //Turns on port A, pin 0 as an output
 
