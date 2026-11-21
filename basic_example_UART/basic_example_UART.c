@@ -1,15 +1,13 @@
-/*
- * This is a simple program to introduce UART.
+/* This is a simple program to introduce UART.
  * Pushing S2 on the Launchpad toggles the LED2 on the Launchpad at any time.
- * The program gets characters sent from your Laptop and decides whether it is Number, Letter or Other. Then,
+ * The program gets characters sent from your Laptop and decides whether it is a number (N), letter (L) or other (O). Then,
  * it sends back N, L or O to the laptop in response.
  * Sending lower case c from laptop changes the baudrate.
- * The system clock for this project is 3MHz and all the UART calcuations are based on this number.
- */
+ * The system clock for this project is 3MHz and all the UART calcuations are based on this number. */
+
 #include <ti/devices/msp/msp.h>
 #include <ti/driverlib/driverlib.h>
 #include <ti/driverlib/m0p/dl_core.h>
-#include "HAL/pins.h"
 
 typedef enum {baud9600, baud19200, baud38400, baud57600} UARTBaudRate_t;
 
@@ -67,13 +65,14 @@ int main(void) {
             if (DL_UART_Main_isTXFIFOEmpty(UART0))
                 DL_UART_Main_transmitData(UART0, tChar);
 
-            // If the character is 'c', it also means to change the baudrate
+            /* If the character is 'c', it also means to change the baudrate
+             * Each of these baudrates are computed for a clock rate of 32 MHz */
             if (rChar == 'c') {
                 switch (baudRate) {
                     case baud9600:
-                        while (DL_UART_Main_isBusy(UART0)) {}            // let the last character finish sending
+                        while (DL_UART_Main_isBusy(UART0)) {} // Let the last character finish sending
                         DL_UART_Main_disable(UART0);
-                        DL_UART_Main_setBaudRateDivisor(UART0, 104, 11); // 19200 baud at 32 MHz
+                        DL_UART_Main_setBaudRateDivisor(UART0, 104, 11); // 19200 baud
                         DL_UART_Main_enable(UART0);
                         baudRate = baud19200;
                         break;
@@ -105,8 +104,8 @@ int main(void) {
             }
         }
 
-        // The non-blocking test. This part of code should always work smoothly if other parts of code are not blocking it.
-        // If the button is not pressed, keep the LED off
+        /* The non-blocking test. This part of code should always work smoothly if other parts of code are not blocking it.
+         * If the button is not pressed, keep the LED off */
         if (!S2isPressed())
             TurnOff_Launchpad_LED2();
         else
@@ -121,38 +120,38 @@ int main(void) {
 #define PRESSED 0
 
 void InitializeHardware() {
-    DL_GPIO_reset(GPIOB);
-    DL_UART_Main_reset(UART0);
-    DL_GPIO_enablePower(GPIOB); // This is what enables software to write to pins in port B
-    DL_UART_enablePower(UART0);
+    DL_GPIO_reset(GPIOB); // Clear any leftover insturctions in port B pins
+    DL_UART_Main_reset(UART0); // Clear any leftover insturctions in UART0
+    DL_GPIO_enablePower(GPIOB); // Enable writing software to port B pins
+    DL_UART_enablePower(UART0); // Enable writing software to UART 0
     delay_cycles(16); // Good practice to wait for the powered modules to start up before configuring them
 
-    // make sure Tx and Rx pins work for UART and not a regular GPIO pin
-    // PA10: Controls transmitting to launchpad's UART
-    // PA11: Controls receiving from launchpad's UART
-    // (the second argument picks the UART function from that pin's list of possible functions)
-    DL_GPIO_initPeripheralOutputFunction(PA10_IOMUX, PA10_UART0_TX);
-    DL_GPIO_initPeripheralInputFunction(PA11_IOMUX, PA11_UART0_RX);
+    /* Make sure Tx and Rx pins work for UART and not a regular GPIO pin
+     * PA10: Controls transmitting to launchpad's UART
+     * PA11: Controls receiving from launchpad's UART
+     * (the second argument picks the UART function from that pin's list of possible functions) */
+    DL_GPIO_initPeripheralOutputFunction(IOMUX_PINCM21, IOMUX_PINCM21_PF_UART0_TX);
+    DL_GPIO_initPeripheralInputFunction(IOMUX_PINCM22, IOMUX_PINCM22_PF_UART0_RX);
 
     // PB21: Controls Launchpad Button 2 (LS2)
-    DL_GPIO_initDigitalInputFeatures(PB21_IOMUX,
+    DL_GPIO_initDigitalInputFeatures(IOMUX_PINCM49,
         DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_PULL_UP,
         DL_GPIO_HYSTERESIS_DISABLE, DL_GPIO_WAKEUP_DISABLE);
 
     // PB26: Controls Launchpad LED2 (LL2)
-    DL_GPIO_initDigitalOutput(PB26_IOMUX);
-    DL_GPIO_clearPins(PB26_PORT, PB26_PIN);
-    DL_GPIO_enableOutput(PB26_PORT, PB26_PIN);
+    DL_GPIO_initDigitalOutput(IOMUX_PINCM57);
+    DL_GPIO_clearPins(GPIOB, DL_GPIO_PIN_26);
+    DL_GPIO_enableOutput(GPIOB, DL_GPIO_PIN_26);
 }
 
 void TurnOn_Launchpad_LED2() {
-    DL_GPIO_setPins(PB26_PORT, PB26_PIN);
+    DL_GPIO_setPins(GPIOB, DL_GPIO_PIN_26);
 }
 
 void TurnOff_Launchpad_LED2() {
-    DL_GPIO_clearPins(PB26_PORT, PB26_PIN);
+    DL_GPIO_clearPins(GPIOB, DL_GPIO_PIN_26);
 }
 
 char S2isPressed() {
-    return DL_GPIO_readPins(PB21_PORT, PB21_PIN) == PRESSED;
+    return DL_GPIO_readPins(GPIOB, DL_GPIO_PIN_21) == PRESSED;
 }

@@ -4,7 +4,7 @@
  * This example use memory-mapped registers to communicate with GPIO peripherals.
  * This example doesn't use any Driverlib function. It does not build a Hardware Abstraction Layer (HAL). */
 
-// Note how we wihout DiverLib, we don't have any files imported by default
+// Note how wihout DiverLib used, we don't have any files imported by default
 
 #define POWER_STARTUP_DELAY 16
 #define PRESSED 0
@@ -55,7 +55,7 @@ int main() {
     
     while (1) {
         /* Read the pin voltage thats connected to Launchpad Right Button (LB2) to see if the button has been pressed
-         * Clearing the LED turns it on here since LL1 is active low*/
+         * Clearing the LED turns it on here since LL1 is active low */
         if ((*GPIOB_DIN_address & (1 << 21)) == PRESSED)
             *GPIOA_DOUTCLR_address = 1 << 0; // Turn on Launchpad LED1 (LL1)
         else

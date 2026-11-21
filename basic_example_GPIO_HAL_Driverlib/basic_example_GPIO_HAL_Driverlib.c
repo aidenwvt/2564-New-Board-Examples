@@ -17,11 +17,10 @@ void LL1_turnOff();
 #define PRESSED 0
 
 int main() {
-    initializeGPIO(); //We create an initialize function as part of the HAL protocol
+    initializeGPIO(); // We create an initialize function as part of the HAL protocol
     
     while (1) {
-        /*We define helper functions so its more intuitive to use
-         *trying to work with launchpad hardware configuration */
+        // We define helper functions so its more intuitive to use launchpad hardware
         if (LB2_isPressed())
             LL1_turnOn();
         else
